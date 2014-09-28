@@ -16,12 +16,12 @@ module Wego
 
     # Configuration defaults
     @@config = {
-    :wego_api_url_prefix => "api.wego.com/flights/api/k",
-    :version => '2',
-    :api_key => 'b2af842a51f01435cdb7',
-    :ts_code => '9e802',
-    :base_headers => {content_type: :json, accept: :json},
-    :locale => 'fr'
+        :wego_api_url_prefix => "api.wego.com/flights/api/k",
+        :version => '2',
+        :api_key => 'b2af842a51f01435cdb7',
+        :ts_code => '9e802',
+        :base_headers => {content_type: :json, accept: :json},
+        :locale => 'fr'
     }
 
     @valid_config_keys = @@config.keys
@@ -34,6 +34,7 @@ module Wego
       @@config[:currencies_url] = @@config[:wego_api_url_prefix]+'/'+@@config[:version]+'/currencies'
       @@config[:base_params] = {api_key: @@config[:api_key], ts_code: @@config[:ts_code], locale: @@config[:locale]}
     end
+
     # Configure through yaml file
     def self.configure_with(path_to_yaml_file)
       begin
@@ -71,26 +72,29 @@ module Wego
           }
       ]
       postBody = {trips: trips, departure_city: true, arrival_city: true, adults_count: adults_count}
-      tripResponse = postToWego(@@config[:searches_url],postBody)
-      if(tripResponse.code == 200)
+      tripResponse = postToWego(@@config[:searches_url], postBody)
+      if (tripResponse.code == 200)
         sleep(10) #Or do something during that 10 sec.
         search_data = JSON.parse(tripResponse.body)
         @@logger.debug(search_data)
-        get_fares(search_data["id"],search_data["trips"][0]["id"])
+        fareResponse = get_fares(search_data["id"], search_data["trips"][0]["id"])
+        if (fareResponse.code == 200)
+          JSON.parse(fareResponse.body)
+        end
       end
     end
 
-    def get_fares(search_id, trip_id, filters = {}  )
+    def get_fares(search_id, trip_id, filters = {})
       postBody = {
-          id:               Random.new_seed,
-          search_id:        search_id,
-          trip_id:          trip_id,
+          id: Random.new_seed,
+          search_id: search_id,
+          trip_id: trip_id,
           fares_query_type: 'route'
       }.merge(filters)
-      postToWego(@@config[:fares_url],postBody)
+      postToWego(@@config[:fares_url], postBody)
     end
 
-    def postToWego(url,postBody)
+    def postToWego(url, postBody)
       response = RestClient.post(url, postBody.to_json, {params: @@config[:base_params]}.merge(@@config[:base_headers]))
       @@logger.debug(" response is :::\n #{response.dump}\n------------")
       response
