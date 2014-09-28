@@ -25,7 +25,7 @@ module Wego
 
   # Configure through hash
   def self.configure(opts = {})
-    opts.each { |k, v| @config[k.to_sym] = v if @valid_config_keys.include? k.to_sym }
+    opts.each { |k, v| @@config[k.to_sym] = v if @valid_config_keys.include? k.to_sym }
   end
 
   # Configure through yaml file
@@ -41,11 +41,11 @@ rescue Psych::SyntaxError
   configure(config)
 
   def self.config
-    @config[:searches_url] = @config[:wego_api_url_prefix]+'/'+@config[:version]+'/searches'
-    @config[:fares_url] = @config[:wego_api_url_prefix]+'/'+@config[:version]+'/fares'
-    @config[:currencies_url] = @config[:wego_api_url_prefix]+'/'+@config[:version]+'/currencies'
-    @config[:base_params] = {api_key: @config[:api_key], ts_code: @config[:ts_code], locale: @config[:locale]}
-    @config
+    @@config[:searches_url] = @@config[:wego_api_url_prefix]+'/'+@@config[:version]+'/searches'
+    @@config[:fares_url] = @@config[:wego_api_url_prefix]+'/'+@@config[:version]+'/fares'
+    @@config[:currencies_url] = @@config[:wego_api_url_prefix]+'/'+@@config[:version]+'/currencies'
+    @@config[:base_params] = {api_key: @@config[:api_key], ts_code: @@config[:ts_code], locale: @@config[:locale]}
+    @@config
   end
 
   def self.logger
