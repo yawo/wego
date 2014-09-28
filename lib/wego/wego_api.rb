@@ -75,7 +75,8 @@ module Wego
       if(tripResponse.code == 200)
         sleep(10) #Or do something during that 10 sec.
         search_data = JSON.parse(tripResponse.body)
-        get_fares(search_data[:id],search_data[:trips][0][:id])
+        @@logger.debug(search_data)
+        get_fares(search_data["id"],search_data["trips"][0]["id"])
       end
     end
 
