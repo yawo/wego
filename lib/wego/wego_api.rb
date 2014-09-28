@@ -74,7 +74,8 @@ module Wego
       tripResponse = postToWego(@@config[:searches_url],postBody)
       if(tripResponse.code == 200)
         sleep(10) #Or do something during that 10 sec.
-        get_fares(tripResponse.id,tripResponse.trips[0].id)
+        search_data = JSON.parse(tripResponse.body)
+        get_fares(search_data.id,search_data.trips[0].id)
       end
     end
 
